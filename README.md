@@ -44,6 +44,43 @@ nothing to pip install.
 Then create `binance/config.json` in your project (start from
 `binance-budget/config.example.json`) and set at least `budget_usdt`.
 
+## The dashboard (phone and computer)
+
+`docs/` is a web app with all nine skills in one place: scanner, analyst, news, sizing,
+risk gate, confirmation ticket, alerts, rebalance and journal. Arabic and English, works
+on a phone. It reads Binance's **public** market data straight from your browser, so there
+is no server, no API key and no account access, and it still **never places an order**:
+you confirm by typing `yes SYMBOL`, then place the order yourself in the Binance app.
+The logic is a port of the Python tools and is tested against them (`tests/js/`).
+
+**Open it**
+
+1. On GitHub: this repository, Settings, Pages, Source "Deploy from a branch", Branch
+   `main`, folder `/docs`. After a minute the page is at
+   `https://<your-user>.github.io/<repo-name>/`.
+2. Or locally: open `docs/index.html` in a browser (no install, no build).
+3. On a phone, open the page link and use "Add to Home Screen".
+
+**Cloud storage (optional)**. By default your settings, journal, alerts and orders stay in
+the browser of that device. To keep them in the cloud and share them between phone and
+computer:
+
+1. Create an empty **private** repository, for example `binance-dashboard-data`.
+2. GitHub, Settings, Developer settings, Fine-grained tokens: a token for **that repository
+   only**, with "Contents: Read and write".
+3. In the dashboard, Settings, Cloud storage: paste `owner/binance-dashboard-data` and the
+   token, then "Test connection". The dashboard refuses a public repository.
+
+The token is stored only on the device you typed it on and is never part of the cloud copy.
+The data file holds your budget, trades and alerts, so keep that repository private. If two
+devices change the data at once, the dashboard shows the conflict and lets you choose which
+copy wins. Alerts are only checked while the page is open (no Telegram in the browser, so no
+bot token ever lives in a browser).
+
+Network note: news RSS feeds do not allow browsers to read them directly, so they go through
+the public rss2json.com converter; Binance's own announcement list is read directly. If your
+network blocks Binance, the dashboard says so instead of showing "no news".
+
 ## The nine
 
 | command | job | what it does |
@@ -125,6 +162,15 @@ BNB discount). A stop on Spot can fill worse than its price in a fast market.
 
 **Taxes and local rules** depend on where you live. Nothing here is tax advice.
 
+## Tests
+
+```bash
+python3 -I -m unittest discover -s tests            # the Python tools
+python3 -I tests/js/make_fixtures.py                   # run the Python reference on synthetic data
+node --test tests/js/parity.test.js                    # the dashboard logic must match it
+npm i jsdom && node --test tests/js/ui.test.js         # optional: click through the whole UI
+```
+
 ## Files
 
 ```
@@ -137,7 +183,8 @@ binance-ticket/     SKILL.md, ticket.py
 binance-alerts/     SKILL.md, alerts.py
 binance-rebalance/  SKILL.md, rebalance.py
 binance-journal/    SKILL.md, journal.py
-tests/              unittest suite + synthetic fixtures
+docs/               the dashboard: index.html, core.js (logic), app.js (UI), i18n.js, style.css
+tests/              unittest suite + synthetic fixtures; tests/js has the dashboard parity and UI tests
 ```
 
 MIT. Inspired by the structure of Jake Schincariol's stock-market Trader skill

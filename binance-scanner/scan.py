@@ -12,8 +12,10 @@ Standard library only (Python 3.8+).
 import argparse
 import json
 import os
+import re
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -34,10 +36,24 @@ DEFAULTS = {
     "min_stop_pct": 1.0,        # but never closer than this percent
     "btc_filter": True,         # no new setups while BTC is under its 1h EMA50
     "blocked": [],              # base assets to never scan, e.g. ["LUNC"]
+    "exclude_bstocks": True,    # Binance's tokenized US stocks/ETFs (GOOGLB, QQQB...) are not crypto trades
+    "bstock_allow": [],         # extra real coins whose ticker happens to end in B
 }
 # stablecoins and fiat bases are not trades
-STABLES = {"USDC", "FDUSD", "TUSD", "USDP", "DAI", "BUSD", "USDD", "USD1", "USDE", "AEUR", "EURI",
-           "EUR", "GBP", "TRY", "BRL", "ARS", "PLN", "RON", "UAH", "ZAR", "MXN", "CZK", "JPY", "XUSD"}
+STABLES = {"USDC", "FDUSD", "TUSD", "USDP", "DAI", "BUSD", "USDD", "USD1", "USDE", "USDS", "USDG", "RLUSD", "PYUSD",
+           "BFUSD", "AEUR", "EURI", "EUR", "GBP", "TRY", "BRL", "ARS", "PLN", "RON", "UAH", "ZAR", "MXN", "CZK", "JPY", "XUSD"}
+# real coins whose ticker ends in B (everything else shaped like TICKERB is a tokenized stock)
+BSTOCK_KEEP = {"BNB", "SHIB", "TRB", "CKB", "BTCB"}
+
+
+def is_stable_base(base):
+    return base in STABLES or bool(re.search(r"USD$", base)) or bool(re.match(r"^USD[A-Z0-9]$", base))
+
+
+def is_bstock(base, cfg):
+    if base in BSTOCK_KEEP or base in {x.upper() for x in cfg.get("bstock_allow", [])}:
+        return False
+    return bool(re.match(r"^[A-Z]{2,5}B$", base))
 
 
 class ApiError(Exception):
@@ -282,7 +298,7 @@ def pick_universe(info, tickers, cfg, symbols=None, top=40):
         if s.get("isSpotTradingAllowed") is False:
             continue
         base = s.get("baseAsset", "")
-        if base in STABLES or base in blocked:
+        if is_stable_base(base) or base in blocked or (cfg.get("exclude_bstocks", True) and is_bstock(base, cfg)):
             continue
         ok[s["symbol"]] = s
     rows = [t for t in tickers if t.get("symbol") in ok and float(t.get("lastPrice") or 0) > 0]
@@ -295,7 +311,7 @@ def pick_universe(info, tickers, cfg, symbols=None, top=40):
     return rows[:top] if not symbols else rows
 
 
-def run(cfg, symbols=None, top=40, pause=0.05, ignore_btc=False, log=print):
+def run(cfg, symbols=None, top=40, pause=0.05, ignore_btc=False, log=print, workers=6):
     info = fetch_json("/api/v3/exchangeInfo")
     tickers = fetch_json("/api/v3/ticker/24hr")
     books = {b["symbol"]: b for b in fetch_json("/api/v3/ticker/bookTicker")}
@@ -303,8 +319,8 @@ def run(cfg, symbols=None, top=40, pause=0.05, ignore_btc=False, log=print):
     now = now_ms()
     btc = btc_state(parse_klines(fetch_json("/api/v3/klines", {"symbol": "BTCUSDT", "interval": "1h", "limit": 100}), now))
     btc_ok = True if ignore_btc else btc["ok"]
-    results, errors = [], []
-    for t in universe:
+
+    def work(t):
         sym = t["symbol"]
         try:
             frames = [parse_klines(fetch_json("/api/v3/klines", {"symbol": sym, "interval": tf, "limit": 100}), now)
@@ -312,19 +328,24 @@ def run(cfg, symbols=None, top=40, pause=0.05, ignore_btc=False, log=print):
         except ApiError as exc:
             if "rate limit" in str(exc):
                 raise
-            errors.append({"symbol": sym, "error": str(exc)})
-            continue
+            return {"error": {"symbol": sym, "error": str(exc)}}
         item = evaluate(sym, t, books.get(sym, {}), frames[0], frames[1], frames[2], cfg, btc_ok)
-        if item is None:
-            errors.append({"symbol": sym, "error": "not enough candle history"})
-        else:
-            results.append(item)
         time.sleep(pause)
+        return {"error": {"symbol": sym, "error": "not enough candle history"}} if item is None else {"item": item}
+
+    results, errors = [], []
+    # several requests at once: a slow network made the one-at-a-time version take minutes
+    with ThreadPoolExecutor(max_workers=max(1, int(workers))) as pool:
+        for out in pool.map(work, universe):
+            if "error" in out:
+                errors.append(out["error"])
+            else:
+                results.append(out["item"])
     results.sort(key=lambda r: r["score"], reverse=True)
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "market": {"btc": btc, "btc_filter_applied": cfg["btc_filter"] and not ignore_btc},
-        "params": {k: cfg[k] for k in DEFAULTS if k != "blocked"},
+        "params": {k: cfg[k] for k in DEFAULTS if k not in ("blocked", "bstock_allow")},
         "scanned": len(universe),
         "candidates": [r for r in results if r["qualified"]],
         "watch": [r for r in results if not r["qualified"]][:10],
@@ -368,7 +389,9 @@ def main(argv=None):
     ap.add_argument("--min-score", type=int, help="override config min_score")
     ap.add_argument("--min-volume", type=float, help="override config min_quote_volume (USDT)")
     ap.add_argument("--ignore-btc", action="store_true", help="skip the BTC market filter")
-    ap.add_argument("--pause", type=float, default=0.05, help="seconds between symbols")
+    ap.add_argument("--pause", type=float, default=0.05, help="seconds each worker waits after a symbol")
+    ap.add_argument("--workers", type=int, default=6, help="parallel requests (default 6)")
+    ap.add_argument("--include-bstocks", action="store_true", help="also scan Binance's tokenized stocks (excluded by default)")
     ap.add_argument("--config", default=os.path.join(DATA_DIR, "config.json"))
     ap.add_argument("--write", action="store_true", help="write %s" % os.path.join(DATA_DIR, "candidates.json"))
     ap.add_argument("--json", action="store_true", help="print JSON instead of a table")
@@ -378,9 +401,11 @@ def main(argv=None):
         cfg["min_score"] = args.min_score
     if args.min_volume is not None:
         cfg["min_quote_volume"] = args.min_volume
+    if args.include_bstocks:
+        cfg["exclude_bstocks"] = False
     symbols = [s.strip() for s in args.symbols.split(",") if s.strip()] if args.symbols else None
     try:
-        report = run(cfg, symbols, args.top, args.pause, args.ignore_btc)
+        report = run(cfg, symbols, args.top, args.pause, args.ignore_btc, workers=args.workers)
     except ApiError as exc:
         sys.exit("scan failed: %s" % exc)
     if args.write:

@@ -28,7 +28,7 @@ python3 "${CLAUDE_SKILL_DIR}/scan.py" --ignore-btc           # skip the BTC mark
 ## What it does
 
 1. Takes Spot pairs quoted in USDT with status TRADING. Stablecoins, fiat bases
-   and `blocked` coins are left out. Pairs under `min_quote_volume` (24h) are left out.
+   `blocked` coins and Binance's tokenized US stocks/ETFs (names like GOOGLB, QQQB; set `exclude_bstocks` to false to scan them) are left out, as are stablecoins such as USDC, FDUSD and RLUSD. Pairs under `min_quote_volume` (24h) are left out.
 2. Reads 4h, 1h and 15m candles. The candle still forming is dropped, so every
    number comes from closed candles.
 3. Scores each pair out of 100:

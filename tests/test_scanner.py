@@ -122,5 +122,42 @@ class FullScan(unittest.TestCase):
         self.assertEqual(len(rep["candidates"]), 1)
 
 
+class Exclusions(unittest.TestCase):
+    def specs(self):
+        specs = S.universe()
+        up = specs["UPUSDT"]
+        for sym, base in (("GOOGLBUSDT", "GOOGLB"), ("QQQBUSDT", "QQQB"), ("RLUSDUSDT", "RLUSD"), ("BNBUSDT", "BNB"), ("SHIBUSDT", "SHIB")):
+            specs[sym] = dict(up, base=base)
+        return specs
+
+    def scan(self, cfg_over=None, **kw):
+        scan.now_ms = lambda: S.NOW
+        scan.fetch_json = S.fake_api(self.specs())
+        cfg = scan.load_config("/nonexistent")
+        cfg.update(cfg_over or {})
+        rep = scan.run(cfg, pause=0, **kw)
+        return {r["symbol"] for r in rep["candidates"] + rep["watch"]}, rep
+
+    def test_tokenized_stocks_and_newer_stablecoins_are_not_scanned(self):
+        seen, _ = self.scan()
+        self.assertFalse({"GOOGLBUSDT", "QQQBUSDT", "RLUSDUSDT"} & seen)
+        self.assertTrue({"BNBUSDT", "SHIBUSDT"} <= seen)         # real coins that end in B stay
+
+    def test_bstocks_can_be_switched_back_on(self):
+        seen, _ = self.scan({"exclude_bstocks": False})
+        self.assertIn("GOOGLBUSDT", seen)
+        self.assertNotIn("RLUSDUSDT", seen)                        # stablecoins stay out either way
+
+    def test_bstock_allow_list_keeps_a_real_coin(self):
+        self.assertFalse(scan.is_bstock("ABCB", {"bstock_allow": ["abcb"]}))
+        self.assertTrue(scan.is_bstock("ABCB", {"bstock_allow": []}))
+
+    def test_parallel_and_serial_scans_agree(self):
+        _, a = self.scan(workers=1)
+        _, b = self.scan(workers=6)
+        key = lambda rep: [(r["symbol"], r["score"]) for r in rep["candidates"] + rep["watch"]]
+        self.assertEqual(key(a), key(b))
+
+
 if __name__ == "__main__":
     unittest.main()

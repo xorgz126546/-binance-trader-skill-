@@ -1,0 +1,77 @@
+/* UI strings. Arabic is the default; English is one tap away. Engine messages (risk reasons, scan reasons) stay in English. */
+(function () {
+  const AR = {
+    app: 'لوحة تداول Binance', safe: '🔒 تنفيذ يدوي فقط: هذا التطبيق لا يضع أوامر ولا يطلب مفتاح API. بيانات السوق العامة فقط، Spot / USDT.',
+    home: 'الرئيسية', scan: 'الماسح', orders: 'الأوامر', journal: 'السجل', more: 'المزيد', analyst: 'المحلل', news: 'الأخبار', alerts: 'التنبيهات', rebalance: 'إعادة التوازن', settings: 'الإعدادات',
+    language: 'اللغة', cloud_ok: '☁️ محفوظ', cloud_saving: '☁️ جارٍ الحفظ…', cloud_off: '💾 محلي فقط', cloud_error: '⚠️ خطأ سحابة', cloud_conflict: '⚠️ تعارض', cloud_syncing: '☁️ مزامنة…',
+    budget: 'الميزانية', today_pnl: 'ربح/خسارة اليوم', open_pos: 'صفقات مفتوحة', active_alerts: 'تنبيهات نشطة', btc_filter: 'فلتر BTC', btc_ok: 'BTC فوق EMA50 (1h)', btc_bad: 'BTC تحت EMA50 (1h): لا صفقات جديدة',
+    refresh: 'تحديث', unknown: 'غير معروف', price: 'السعر', entry: 'الدخول', stop: 'الوقف', target: 'الهدف', qty: 'الكمية', pnl: 'الربح/الخسارة', close: 'إغلاق', cancel: 'إلغاء', save: 'حفظ', remove: 'حذف', add: 'إضافة', back: 'رجوع', yes: 'نعم', no: 'لا',
+    how_title: 'طريقة العمل', how1: '1) الماسح يرتّب الأزواج', how2: '2) احسب الحجم حسب ميزانيتك', how3: '3) فحص المخاطر (PASS/BLOCK)', how4: '4) اكتب «yes SYMBOL» للتأكيد', how5: '5) ضع الأمر يدويًا في تطبيق Binance', how6: '6) سجّل التنفيذ في السجل',
+    no_positions: 'لا توجد صفقات مفتوحة.', no_orders: 'لا توجد أوامر. شغّل الماسح ثم اضغط «احسب الحجم».',
+    scan_run: 'شغّل الماسح', scan_running: 'جارٍ المسح…', scan_top: 'عدد الأزواج', scan_min: 'أدنى سكور', scan_syms: 'رموز محددة (اختياري) مثل SOLUSDT,ETHUSDT', scan_ignore_btc: 'تجاهل فلتر BTC',
+    scan_none: 'لا صفقة (NO TRADE): لا شيء اجتاز الشروط. أقرب الحالات بالأسفل مع سبب الرفض.', qualified: 'اجتازت الشروط', watch: 'قائمة المراقبة (لم تجتز)', scanned: 'تم مسح', pairs: 'زوج',
+    excluded: 'مستبعد', stables: 'عملات مستقرة', bstocks: 'أسهم مرمّزة (bStocks)', size_it: 'احسب الحجم', size_anyway: 'احسب رغم الرفض', analyze: 'حلّل', size_top: 'احسب أفضل 3', last_scan: 'آخر مسح',
+    relvol: 'حجم نسبي', stop_pct: 'مسافة الوقف', spread: 'السبريد', change24: '24س',
+    analyst_go: 'حلّل', analyst_sym: 'الرمز مثل SOL', verdict: 'الحكم', support: 'دعم', resistance: 'مقاومة', if_long: 'لو شراء', atr_stop: 'وقف ATR', struct_stop: 'وقف هيكلي', vol_trend: 'اتجاه الحجم 1س', bearish_warn: '⚠️ الاتجاه هابط/مختلط: الحجم هنا لا يعني أن الصفقة جيدة.', size_this: 'احسب الحجم لهذا الرمز',
+    news_go: 'حمّل الأخبار', news_coins: 'العملات (BTC,ETH,SOL) أو اتركها لعملات صفقاتك', news_hours: 'آخر كم ساعة', news_market: 'كل السوق', news_none: 'لا أخبار لهذه العملات في هذه المدة.', news_noconn: 'تعذّر الوصول لكل المصادر: هذا «لا اتصال» وليس «لا أخبار».',
+    news_note: 'العناوين والروابط فقط. مصادر RSS تمر عبر محوّل rss2json.com العام، وإعلانات Binance من نقطة غير رسمية قد تتغير.', high: 'عاجل',
+    orders_plan: 'احسب من آخر مسح', orders_balance: 'الميزانية (USDT)', risk_all: 'فحص المخاطر (سعر حي)', clear_done: 'امسح المنتهية', skipped: 'متجاوَز',
+    st_proposed: 'مقترح', st_blocked: 'محظور', st_risk_pass: 'اجتاز المخاطر', st_approved: 'مؤكَّد', st_placed: 'وُضع', st_cancelled: 'ملغى', st_closed: 'مغلق', READY: 'جاهز', 'NOT READY': 'غير جاهز', DONE: 'منتهٍ',
+    confirm_label: 'للتأكيد اكتب', approve: 'أكّد', show_steps: 'خطوات التنفيذ', mark_placed: 'وضعته في Binance', fill_price: 'سعر التنفيذ الحقيقي', fill_qty: 'الكمية الحقيقية', record_fill: 'سجّل التنفيذ في السجل', risk: 'المخاطرة', rr: 'ر/ع', notional: 'القيمة', stop_limit: 'حد الوقف',
+    j_open: 'فتح صفقة (بعد التنفيذ الحقيقي)', j_close: 'إغلاق صفقة', j_symbol: 'الرمز', j_price: 'السعر', j_qty: 'الكمية', j_stop: 'الوقف', j_target: 'الهدف', j_fee: 'الرسوم USDT (اختياري)', j_closed: 'الصفقات المغلقة', j_stats: 'الإحصاءات', j_none: 'لا صفقات مغلقة بعد.', j_few: 'عدد الصفقات قليل جدًا للحكم على الطريقة.',
+    st_trades: 'صفقات', st_win: 'نسبة الربح', st_total: 'المجموع', st_fees: 'الرسوم', st_pf: 'عامل الربح', st_exp: 'التوقع/صفقة', st_avgr: 'متوسط R', st_dd: 'أقصى تراجع', closed_at: 'أُغلقت',
+    al_add: 'أضف تنبيهًا', al_dir_above: 'فوق', al_dir_below: 'تحت', al_level: 'المستوى', al_kind: 'النوع', al_note: 'ملاحظة', al_from_j: 'من صفقاتي المفتوحة', al_from_o: 'من أوامري', al_check: 'افحص الآن', al_rearm: 'أعد التفعيل', al_notify: 'فعّل إشعارات المتصفح', al_auto: 'فحص تلقائي كل 30 ثانية والصفحة مفتوحة', al_none: 'لا تنبيهات.', al_fired: 'انطلق', al_active: 'نشط', al_note2: 'التنبيهات تُفحص فقط ما دامت الصفحة مفتوحة. لا يوجد إرسال Telegram هنا حتى لا يُخزَّن أي توكن في المتصفح.',
+    rb_portfolio: 'محفظتك', rb_targets: 'النسب المستهدفة %', rb_asset: 'الأصل', rb_amount: 'الكمية', rb_compute: 'احسب', rb_band: 'النطاق (نقاط)', rb_min: 'أدنى صفقة USDT', rb_inside: 'داخل النطاق: لا شيء لفعله. إعادة التوازن داخل النطاق تكلّف رسومًا فقط.', rb_send: 'أرسل للأوامر', rb_total: 'قيمة المحفظة', rb_sum: 'مجموع النسب', rb_weight: 'الوزن', rb_target: 'الهدف', rb_drift: 'الانحراف', rb_untargeted: 'لها رصيد وليست في الأهداف (تُترك)', rb_unpriced: 'بلا سعر USDT (تُترك)',
+    s_cfg: 'قواعد المخاطرة والماسح', s_cloud: 'التخزين السحابي', s_data: 'النسخ الاحتياطي', s_reset: 'القيم الافتراضية', s_saved: 'تم الحفظ', s_blocked: 'عملات محظورة (BTC,ETH بفواصل)',
+    c_repo: 'مستودع GitHub الخاص (owner/name)', c_path: 'اسم الملف', c_branch: 'الفرع (اختياري)', c_token: 'التوكن (Fine-grained، Contents: read/write لهذا المستودع فقط)', c_auto: 'حفظ تلقائي بعد كل تغيير', c_test: 'اختبر الاتصال', c_sync: 'زامن الآن', c_off: 'افصل', c_help: 'أنشئ مستودعًا خاصًا فارغًا (مثل binance-dashboard-data) ثم توكن Fine-grained يخصه فقط بصلاحية Contents: Read and write. التوكن يُخزَّن في هذا الجهاز فقط ولا يدخل في النسخة السحابية.',
+    c_public_warn: '⚠️ هذا المستودع عام! بياناتك (ميزانية، صفقات) ستكون مرئية للجميع. اجعله خاصًا.', c_connected: 'متصل بمستودع خاص', c_use_cloud: 'استخدم النسخة السحابية', c_keep_local: 'احتفظ بهذا الجهاز واستبدل السحابة', c_conflict: 'تعارض: تغيّرت البيانات في جهاز آخر وعندك تغييرات غير محفوظة.',
+    d_export: 'تصدير JSON', d_import: 'استيراد JSON', d_import_go: 'استيراد', d_bad: 'ملف غير صالح', d_imported: 'تم الاستيراد',
+    cfg_note_risk: 'تحذير: المخاطرة الصارمة فوق 2% غير مستحسنة.', t_ok: 'تم', t_err: 'خطأ', t_net: 'تعذّر الاتصال بـ Binance. قد تكون الشبكة تحجبه: جرّب شبكة أخرى أو VPN.', t_loaded: 'تم التحميل', fired_toast: 'تنبيه',
+    ph_confirm: 'yes ', th_symbol: 'الرمز', th_score: 'سكور', th_setup: 'النمط', th_pnl: 'ربح/خسارة', th_r: 'R',
+    disc: 'للتعليم وليس نصيحة مالية. التداول فيه مخاطرة خسارة رأس المال. القرار والتنفيذ لك.'
+  };
+  const EN = {
+    app: 'Binance Trader Dashboard', safe: '🔒 Manual execution only: this app never places orders and never asks for an API key. Public market data only, Spot / USDT.',
+    home: 'Home', scan: 'Scanner', orders: 'Orders', journal: 'Journal', more: 'More', analyst: 'Analyst', news: 'News', alerts: 'Alerts', rebalance: 'Rebalance', settings: 'Settings',
+    language: 'Language', cloud_ok: '☁️ Saved', cloud_saving: '☁️ Saving…', cloud_off: '💾 Local only', cloud_error: '⚠️ Cloud error', cloud_conflict: '⚠️ Conflict', cloud_syncing: '☁️ Syncing…',
+    budget: 'Budget', today_pnl: "Today's P&L", open_pos: 'Open positions', active_alerts: 'Active alerts', btc_filter: 'BTC filter', btc_ok: 'BTC above 1h EMA50', btc_bad: 'BTC under 1h EMA50: no new setups',
+    refresh: 'Refresh', unknown: 'unknown', price: 'Price', entry: 'Entry', stop: 'Stop', target: 'Target', qty: 'Amount', pnl: 'P&L', close: 'Close', cancel: 'Cancel', save: 'Save', remove: 'Remove', add: 'Add', back: 'Back', yes: 'Yes', no: 'No',
+    how_title: 'How it works', how1: '1) The scanner ranks pairs', how2: '2) Size the order to your budget', how3: '3) Risk check (PASS/BLOCK)', how4: '4) Type "yes SYMBOL" to confirm', how5: '5) Place the order by hand in the Binance app', how6: '6) Record the fill in the journal',
+    no_positions: 'No open positions.', no_orders: 'No orders yet. Run the scanner, then tap "Size it".',
+    scan_run: 'Run scanner', scan_running: 'Scanning…', scan_top: 'Pairs to scan', scan_min: 'Min score', scan_syms: 'Specific symbols (optional) e.g. SOLUSDT,ETHUSDT', scan_ignore_btc: 'Ignore BTC filter',
+    scan_none: 'NO TRADE: nothing passed. Closest setups below, with the reason each failed.', qualified: 'Qualified', watch: 'Watch list (did not qualify)', scanned: 'Scanned', pairs: 'pairs',
+    excluded: 'Excluded', stables: 'stablecoins', bstocks: 'tokenized stocks (bStocks)', size_it: 'Size it', size_anyway: 'Size anyway', analyze: 'Analyze', size_top: 'Size top 3', last_scan: 'Last scan',
+    relvol: 'Rel. volume', stop_pct: 'Stop distance', spread: 'Spread', change24: '24h',
+    analyst_go: 'Analyze', analyst_sym: 'Symbol e.g. SOL', verdict: 'Verdict', support: 'Support', resistance: 'Resistance', if_long: 'If long', atr_stop: 'ATR stop', struct_stop: 'Structure stop', vol_trend: '1h volume trend', bearish_warn: "⚠️ The trend is down or mixed: being able to size it doesn't make it a good trade.", size_this: 'Size this symbol',
+    news_go: 'Load news', news_coins: 'Coins (BTC,ETH,SOL) or leave empty for your open positions', news_hours: 'Last hours', news_market: 'Whole market', news_none: 'No news for these coins in this window.', news_noconn: 'No source could be read: this is "no connection", not "no news".',
+    news_note: 'Headlines and links only. RSS feeds go through the public rss2json.com converter; Binance announcements use an unofficial endpoint that can change.', high: 'urgent',
+    orders_plan: 'Size from last scan', orders_balance: 'Budget (USDT)', risk_all: 'Risk check (live price)', clear_done: 'Clear finished', skipped: 'Skipped',
+    st_proposed: 'proposed', st_blocked: 'blocked', st_risk_pass: 'risk pass', st_approved: 'approved', st_placed: 'placed', st_cancelled: 'cancelled', st_closed: 'closed', READY: 'READY', 'NOT READY': 'NOT READY', DONE: 'DONE',
+    confirm_label: 'To confirm type', approve: 'Confirm', show_steps: 'Execution steps', mark_placed: 'I placed it on Binance', fill_price: 'Real fill price', fill_qty: 'Real amount', record_fill: 'Record the fill in the journal', risk: 'Risk', rr: 'R:R', notional: 'Value', stop_limit: 'Stop-limit',
+    j_open: 'Open a position (after the real fill)', j_close: 'Close a position', j_symbol: 'Symbol', j_price: 'Price', j_qty: 'Amount', j_stop: 'Stop', j_target: 'Target', j_fee: 'Fee USDT (optional)', j_closed: 'Closed trades', j_stats: 'Stats', j_none: 'No closed trades yet.', j_few: 'Too few trades to say whether the method works.',
+    st_trades: 'Trades', st_win: 'Win rate', st_total: 'Total', st_fees: 'Fees', st_pf: 'Profit factor', st_exp: 'Expectancy/trade', st_avgr: 'Avg R', st_dd: 'Max drawdown', closed_at: 'Closed',
+    al_add: 'Add an alert', al_dir_above: 'above', al_dir_below: 'below', al_level: 'Level', al_kind: 'Kind', al_note: 'Note', al_from_j: 'From my open positions', al_from_o: 'From my orders', al_check: 'Check now', al_rearm: 'Re-arm', al_notify: 'Enable browser notifications', al_auto: 'Auto-check every 30 s while this page is open', al_none: 'No alerts.', al_fired: 'fired', al_active: 'active', al_note2: 'Alerts are only checked while this page is open. There is no Telegram here, so no bot token is ever stored in a browser.',
+    rb_portfolio: 'Your holdings', rb_targets: 'Target weights %', rb_asset: 'Asset', rb_amount: 'Amount', rb_compute: 'Compute', rb_band: 'Band (points)', rb_min: 'Min trade USDT', rb_inside: 'Within the band: nothing to do. Rebalancing inside the band only pays fees.', rb_send: 'Send to Orders', rb_total: 'Portfolio value', rb_sum: 'Targets sum', rb_weight: 'Weight', rb_target: 'Target', rb_drift: 'Drift', rb_untargeted: 'Held but not in targets (left alone)', rb_unpriced: 'No USDT price (left out)',
+    s_cfg: 'Risk and scanner rules', s_cloud: 'Cloud storage', s_data: 'Backup', s_reset: 'Defaults', s_saved: 'Saved', s_blocked: 'Blocked coins (BTC,ETH comma separated)',
+    c_repo: 'Private GitHub repository (owner/name)', c_path: 'File name', c_branch: 'Branch (optional)', c_token: 'Token (fine-grained, Contents: read/write on this repository only)', c_auto: 'Auto-save after every change', c_test: 'Test connection', c_sync: 'Sync now', c_off: 'Disconnect', c_help: 'Create an empty PRIVATE repository (for example binance-dashboard-data), then a fine-grained token for that repository only with Contents: Read and write. The token stays on this device and is never part of the cloud copy.',
+    c_public_warn: '⚠️ This repository is PUBLIC! Your budget and trades would be visible to everyone. Make it private.', c_connected: 'Connected to a private repository', c_use_cloud: 'Use the cloud copy', c_keep_local: 'Keep this device and overwrite the cloud', c_conflict: 'Conflict: the data changed on another device and you have unsaved changes here.',
+    d_export: 'Export JSON', d_import: 'Import JSON', d_import_go: 'Import', d_bad: 'Not a valid file', d_imported: 'Imported',
+    cfg_note_risk: 'Warning: a hard risk limit above 2% is not recommended.', t_ok: 'Done', t_err: 'Error', t_net: 'Could not reach Binance. Your network may block it: try another network or a VPN.', t_loaded: 'Loaded', fired_toast: 'Alert',
+    ph_confirm: 'yes ', th_symbol: 'Symbol', th_score: 'Score', th_setup: 'Setup', th_pnl: 'P&L', th_r: 'R',
+    disc: 'Educational, not financial advice. Trading risks losing your capital. The decision and the execution are yours.'
+  };
+  const CFGDOC = {
+    budget_usdt: ['رأس المال الذي تديره (USDT)', 'Trading capital managed here (USDT)'], risk_per_trade_pct: ['المخاطرة لكل صفقة %', 'Risk per trade %'],
+    max_risk_pct_hard: ['سقف المخاطرة الصارم %', 'Hard risk ceiling %'], max_position_pct: ['أكبر مركز % من الميزانية', 'Largest position % of budget'],
+    cash_buffer_pct: ['احتياطي نقدي %', 'Cash buffer %'], max_open_positions: ['أقصى صفقات مفتوحة', 'Max open positions'], fee_pct: ['الرسوم لكل جهة %', 'Fee per side %'],
+    stop_limit_gap_pct: ['فجوة حد الوقف %', 'Stop-limit gap %'], min_score: ['أدنى سكور', 'Min score'], min_quote_volume: ['أدنى حجم 24س (USDT)', 'Min 24h volume (USDT)'],
+    max_spread_pct: ['أقصى سبريد %', 'Max spread %'], min_atr_pct: ['أدنى ATR 15د %', 'Min 15m ATR %'], max_atr_pct: ['أقصى ATR 15د %', 'Max 15m ATR %'],
+    stop_atr_mult: ['مضاعف ATR للوقف', 'Stop ATR multiple'], min_stop_pct: ['أقل مسافة وقف %', 'Min stop distance %'], scan_top: ['عدد أزواج المسح', 'Pairs per scan'],
+    min_reward_risk: ['أدنى ربح/مخاطرة', 'Min reward/risk'], max_order_age_minutes: ['عمر الأمر الأقصى (د)', 'Max order age (min)'], max_price_drift_pct: ['أقصى انحراف سعر %', 'Max price drift %'],
+    daily_loss_limit_pct: ['حد الخسارة اليومية %', 'Daily loss limit %'], approval_ttl_minutes: ['صلاحية التأكيد (د)', 'Confirmation validity (min)'], rebalance_band_pct: ['نطاق إعادة التوازن (نقاط)', 'Rebalance band (points)'],
+    min_trade_usdt: ['أدنى صفقة إعادة توازن', 'Min rebalance trade'], btc_filter: ['فلتر BTC', 'BTC market filter'], exclude_bstocks: ['استبعاد الأسهم المرمّزة', 'Exclude tokenized stocks'],
+    min_notional_bump: ['رفع للحد الأدنى لأمر Binance', "Round up to Binance's minimum order"], allow_market_orders: ['السماح بأوامر Market', 'Allow market orders']
+  };
+  (typeof window !== 'undefined' ? window : globalThis).I18N = { ar: AR, en: EN, cfgdoc: CFGDOC };
+  if (typeof module === 'object' && module.exports) module.exports = { ar: AR, en: EN, cfgdoc: CFGDOC };
+})();
