@@ -1,0 +1,18 @@
+{
+  "name": "binance-trader-skill",
+  "description": "Nine Claude skills for Binance Spot: scan the market, analyze a coin, watch the news, size trades to your risk, check them against your rules, get a ticket to place by hand, set alerts, rebalance and keep a journal. Nothing places an order; no API key needed.",
+  "version": "1.0.0",
+  "author": {
+    "name": "binance-trader-skill authors"
+  },
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "claude-skills",
+    "binance",
+    "crypto",
+    "spot",
+    "risk-management",
+    "position-sizing"
+  ]
+}

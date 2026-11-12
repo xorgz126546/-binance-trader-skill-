@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+# your own trading data and settings never belong in a repo
+binance/

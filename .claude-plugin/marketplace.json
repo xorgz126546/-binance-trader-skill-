@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "binance-trader-skill",
+  "description": "The Binance Spot skill pack for Claude",
+  "owner": {
+    "name": "binance-trader-skill authors"
+  },
+  "plugins": [
+    {
+      "name": "binance-trader-skill",
+      "description": "Nine Claude skills for Binance Spot: scanner, analyst, news, budget, risk, ticket, alerts, rebalance and journal. Manual execution only; no API key.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
