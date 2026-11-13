@@ -928,10 +928,20 @@
     await Promise.all(sources.announce.map(async function (s) {
       try { items = items.concat(parseAnnouncements(await fetchJson(s[1]), s[0])); } catch (e) { problems.push(s[0] + ': ' + (e && e.message) + ' (unofficial endpoint)'); }
     }));
-    await Promise.all(sources.rss.map(async function (s) {
-      try { items = items.concat(parseRss2json(await fetchJson('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(s[1])), s[0])); }
-      catch (e) { problems.push(s[0] + ': ' + (e && e.message)); }
-    }));
+    // rss2json's free tier rate-limits by IP (HTTP 429): read the feeds one after another and retry a rate-limited one once.
+    for (const s of sources.rss) {
+      const url = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(s[1]);
+      try {
+        let j;
+        try { j = await fetchJson(url); }
+        catch (e) {
+          if (!/HTTP (429|5\d\d)/.test(String(e && e.message))) throw e;
+          await new Promise(function (r) { setTimeout(r, 1500); });
+          j = await fetchJson(url);
+        }
+        items = items.concat(parseRss2json(j, s[0]));
+      } catch (e) { problems.push(s[0] + ': ' + (e && e.message)); }
+    }
     const out = [], seen = new Set();
     items.forEach(function (it) {
       if (it.when === null || it.when < since) return;

@@ -242,7 +242,7 @@
       '<div class="row"><button class="pri" data-act="run-news">' + t('news_go') + '</button></div><p class="mut small">' + t('news_note') + '</p></div>';
     if (!n) return h;
     h += '<div class="card">';
-    if (!n.items.length) h += '<div class="empty">' + (n.problems.length >= n.total_sources ? t('news_noconn') : t('news_none')) + '</div>';
+    if (!n.items.length) h += '<div class="empty">' + (n.problems.length >= n.total_sources ? t('news_noconn') : n.problems.length ? t('news_partial') : t('news_none')) + '</div>';
     n.items.slice(0, 40).forEach(function (i) {
       h += '<div class="item"><div class="row">' + (i.high ? badge('!! ' + t('high'), 'bad') : '') + '<span class="mut small num">' + i.age_hours.toFixed(1) + 'h · ' + esc(i.source) + '</span>' + i.coins.map(function (c) { return badge(c, 'info'); }).join('') + i.tags.map(function (g) { return badge(g, ''); }).join('') + '</div>' +
         '<div style="margin-top:2px">' + (i.link ? '<a href="' + esc(i.link) + '" target="_blank" rel="noopener noreferrer">' + esc(i.title) + '</a>' : esc(i.title)) + '</div></div>';
