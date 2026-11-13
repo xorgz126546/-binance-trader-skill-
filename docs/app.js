@@ -185,12 +185,15 @@
     return h;
   };
 
+  // Arabic labels and numbers must not share one LTR run (the % and signs jump around): wrap each number on its own.
+  const nm = function (x) { return '<span class="num">' + esc(x) + '</span>'; };
+
   function candCard(r, watch) {
     const b = r.breakdown;
     return '<div class="item"><div class="row sp"><div class="row"><b class="ltr">' + esc(r.symbol) + '</b>' + badge(r.score, r.qualified ? 'ok' : 'warn') + badge(r.setup, 'info') + '</div>' +
-      '<span class="num ' + cls(r.change_24h_pct) + ' small">' + t('change24') + ' ' + sgn(r.change_24h_pct, 1) + '%</span></div>' +
+      '<span class="small ' + cls(r.change_24h_pct) + '">' + t('change24') + ' ' + nm(sgn(r.change_24h_pct, 1) + '%') + '</span></div>' +
       '<div class="kv"><div><div class="k">' + t('entry') + '</div><div class="v">' + fp(r.entry) + '</div></div><div><div class="k">' + t('stop') + '</div><div class="v">' + fp(r.stop) + '</div></div><div><div class="k">' + t('target') + ' 2R</div><div class="v">' + fp(r.take_profit) + '</div></div></div>' +
-      '<div class="mut small num">T' + b.trend + ' C' + b.confirm + ' E' + b.entry + ' V' + b.volume + ' H' + b.heat + ' · ' + t('relvol') + ' ' + r.rel_volume.toFixed(1) + 'x · RSI15 ' + (r.rsi15 === null ? '-' : r.rsi15.toFixed(0)) + ' · ' + t('stop_pct') + ' ' + r.stop_pct.toFixed(2) + '% · ' + t('spread') + ' ' + (r.spread_pct === null ? '-' : r.spread_pct.toFixed(3)) + '%</div>' +
+      '<div class="mut small">' + nm('T' + b.trend + ' C' + b.confirm + ' E' + b.entry + ' V' + b.volume + ' H' + b.heat) + ' · ' + t('relvol') + ' ' + nm(r.rel_volume.toFixed(1) + 'x') + ' · ' + nm('RSI15 ' + (r.rsi15 === null ? '-' : r.rsi15.toFixed(0))) + ' · ' + t('stop_pct') + ' ' + nm(r.stop_pct.toFixed(2) + '%') + ' · ' + t('spread') + ' ' + nm((r.spread_pct === null ? '-' : r.spread_pct.toFixed(3)) + '%') + '</div>' +
       (watch ? '<div class="small warn ltr" style="margin-top:4px">' + esc(r.why_not.slice(0, 2).join('; ')) + '</div>' : '') +
       '<div class="row" style="margin-top:8px"><button class="sm ' + (watch ? '' : 'pri') + '" data-act="size" data-sym="' + esc(r.symbol) + '">' + t(watch ? 'size_anyway' : 'size_it') + '</button><button class="sm ghost" data-act="analyze" data-sym="' + esc(r.symbol) + '">' + t('analyze') + '</button></div></div>';
   }
@@ -229,7 +232,7 @@
       '<div><div class="k">' + t('vol_trend') + '</div><div class="v">' + (a.stats.volume_trend_1h ? a.stats.volume_trend_1h.toFixed(2) + 'x' : '-') + '</div></div></div>' +
       '<h3>' + t('if_long') + '</h3><div class="kv"><div><div class="k">' + t('atr_stop') + '</div><div class="v">' + fp(a.levels.atr_stop) + ' (-' + a.levels.stop_pct.toFixed(2) + '%)</div></div><div><div class="k">2R</div><div class="v">' + fp(a.levels.target_2r) + '</div></div><div><div class="k">3R</div><div class="v">' + fp(a.levels.target_3r) + '</div></div></div>' +
       (a.levels.support_stop ? '<div class="small mut ltr">' + t('struct_stop') + ' ' + fp(a.levels.support_stop) + ' — ' + esc(a.levels.stop_note) + '</div>' : '') +
-      '<div class="small mut num" style="margin-top:6px">24h ' + sgn(a.stats.change_24h_pct) + '% · vol ' + (a.stats.quote_volume_24h / 1e6).toFixed(1) + 'M · ' + t('spread') + ' ' + (a.stats.spread_pct === null ? '-' : a.stats.spread_pct.toFixed(3)) + '%</div>' +
+      '<div class="small mut" style="margin-top:6px">24h ' + nm(sgn(a.stats.change_24h_pct) + '%') + ' · vol ' + nm((a.stats.quote_volume_24h / 1e6).toFixed(1) + 'M') + ' · ' + t('spread') + ' ' + nm((a.stats.spread_pct === null ? '-' : a.stats.spread_pct.toFixed(3)) + '%') + '</div>' +
       (bear ? '<div class="alertbar warnbar" style="margin-top:8px">' + t('bearish_warn') + '</div>' : '') +
       '<div class="row" style="margin-top:10px"><button class="sm" data-act="size-analysis">' + t('size_this') + '</button></div></div>';
     return h;
@@ -297,7 +300,7 @@
       field('jo-stop', t('j_stop'), '', { type: 'number', step: 'any', mode: 'decimal' }) + field('jo-target', t('j_target'), '', { type: 'number', step: 'any', mode: 'decimal' }) + '</div>' +
       '<div class="row" style="margin-top:10px"><button class="pri" data-act="journal-open">' + t('add') + '</button></div></div>';
     h += '<div class="card"><h2>' + t('open_pos') + '</h2>' + (j.open.length ? j.open.map(function (p) {
-      return '<div class="row sp item"><div><b class="ltr">' + esc(p.symbol) + '</b> <span class="mut small num">' + fp(p.qty) + ' @ ' + fp(p.entry) + ' · ' + t('stop') + ' ' + fp(p.stop) + ' · ' + t('target') + ' ' + fp(p.target) + '</span></div><button class="sm" data-act="close-pos" data-sym="' + esc(p.symbol) + '">' + t('close') + '</button></div>'; }).join('') : '<div class="empty">' + t('no_positions') + '</div>') + '</div>';
+      return '<div class="row sp item"><div><b class="ltr">' + esc(p.symbol) + '</b> <span class="mut small">' + nm(fp(p.qty) + ' @ ' + fp(p.entry)) + ' · ' + t('stop') + ' ' + nm(fp(p.stop)) + ' · ' + t('target') + ' ' + nm(fp(p.target)) + '</span></div><button class="sm" data-act="close-pos" data-sym="' + esc(p.symbol) + '">' + t('close') + '</button></div>'; }).join('') : '<div class="empty">' + t('no_positions') + '</div>') + '</div>';
     h += '<div class="card"><h2>' + t('j_stats') + '</h2>';
     if (!s.trades) h += '<div class="empty">' + t('j_none') + '</div>';
     else {
@@ -325,7 +328,7 @@
       '<div class="row" style="margin-top:10px"><label class="row"><input type="checkbox" id="al-auto"' + (D.auto_alerts ? ' checked' : '') + ' data-act="auto-alerts"> <span class="small">' + t('al_auto') + '</span></label>' +
       (notif === 'default' ? '<button class="sm" data-act="notif">' + t('al_notify') + '</button>' : '') + '</div><p class="mut small">' + t('al_note2') + '</p></div>';
     h += '<div class="card">' + (al.length ? al.map(function (a) {
-      return '<div class="row sp item"><div><b class="ltr">' + esc(a.symbol) + '</b> <span class="num">' + t(a.direction === 'above' ? 'al_dir_above' : 'al_dir_below') + ' ' + fp(a.level) + '</span> ' + badge(a.kind, 'info') + (a.triggered_at ? badge(t('al_fired') + ' @ ' + fp(a.price_at_trigger), 'bad') : badge(t('al_active'), 'ok')) +
+      return '<div class="row sp item"><div><b class="ltr">' + esc(a.symbol) + '</b> <span>' + t(a.direction === 'above' ? 'al_dir_above' : 'al_dir_below') + ' ' + nm(fp(a.level)) + '</span> ' + badge(a.kind, 'info') + (a.triggered_at ? badge(t('al_fired') + ' @ ' + fp(a.price_at_trigger), 'bad') : badge(t('al_active'), 'ok')) +
         (a.note ? '<div class="small mut ltr">' + esc(a.note) + '</div>' : '') + '</div><div class="row">' + (a.triggered_at ? '<button class="sm" data-act="alert-rearm" data-id="' + esc(a.id) + '">' + t('al_rearm') + '</button>' : '') + '<button class="sm dng ghost" data-act="alert-del" data-id="' + esc(a.id) + '">✕</button></div></div>'; }).join('') : '<div class="empty">' + t('al_none') + '</div>') + '</div>';
     return h;
   };
@@ -335,7 +338,7 @@
     let h = '<div class="card"><h2>' + t('rb_portfolio') + '</h2>' + pf.map(function (b, i) {
       return '<div class="row item"><b class="ltr" style="min-width:64px">' + esc(b.asset) + '</b><input class="num" style="flex:1" id="pf-' + i + '" value="' + esc(b.amount) + '" inputmode="decimal"><button class="sm dng ghost" data-act="pf-del" data-i="' + i + '">✕</button></div>'; }).join('') +
       '<div class="row" style="margin-top:8px"><div style="flex:1">' + field('pf-asset', t('rb_asset'), '', { ph: 'BTC' }) + '</div><div style="flex:1">' + field('pf-amt', t('rb_amount'), '', { type: 'number', step: 'any', mode: 'decimal' }) + '</div><button class="sm" data-act="pf-add" style="align-self:flex-end">' + t('add') + '</button></div></div>';
-    h += '<div class="card"><h2>' + t('rb_targets') + ' <span class="small ' + (Math.abs(tsum - 100) > 0.5 ? 'neg' : 'pos') + ' num">(' + t('rb_sum') + ' ' + tsum.toFixed(1) + ')</span></h2>' + Object.keys(tg).map(function (k) {
+    h += '<div class="card"><h2>' + t('rb_targets') + ' <span class="small ' + (Math.abs(tsum - 100) > 0.5 ? 'neg' : 'pos') + '">(' + t('rb_sum') + ' ' + nm(tsum.toFixed(1)) + ')</span></h2>' + Object.keys(tg).map(function (k) {
       return '<div class="row item"><b class="ltr" style="min-width:64px">' + esc(k) + '</b><input class="num" style="flex:1" id="tg-' + esc(k) + '" value="' + esc(tg[k]) + '" inputmode="decimal"><button class="sm dng ghost" data-act="tg-del" data-k="' + esc(k) + '">✕</button></div>'; }).join('') +
       '<div class="row" style="margin-top:8px"><div style="flex:1">' + field('tg-asset', t('rb_asset'), '', { ph: 'ETH' }) + '</div><div style="flex:1">' + field('tg-pct', '%', '', { type: 'number', step: 'any', mode: 'decimal' }) + '</div><button class="sm" data-act="tg-add" style="align-self:flex-end">' + t('add') + '</button></div>' +
       '<div class="row" style="margin-top:10px"><button class="sm" data-act="rb-save">' + t('save') + '</button><button class="pri" data-act="rb-run">' + t('rb_compute') + '</button><span class="mut small">' + t('rb_band') + ' ' + c.rebalance_band_pct + ' · ' + t('rb_min') + ' ' + c.min_trade_usdt + '</span></div></div>';
