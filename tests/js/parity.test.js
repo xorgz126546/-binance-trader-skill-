@@ -196,6 +196,18 @@ test('news tags and coin matching match Python', () => {
   });
 });
 
+test('news: a rate-limited feed is retried once, a daily limit is reported without retry', async () => {
+  const src = { announce: [], rss: [['X', 'http://x']] };
+  let calls = 0;
+  let r = await BN.collectNews(async () => { calls++; throw new Error('HTTP 429 (Daily rate limit exceeded)'); }, [], 24, true, src);
+  assert.equal(calls, 1);
+  assert.equal(r.problems.length, 1);
+  calls = 0;
+  r = await BN.collectNews(async () => { calls++; if (calls === 1) throw new Error('HTTP 429'); return { status: 'ok', items: [] }; }, [], 24, true, src);
+  assert.equal(calls, 2);
+  assert.equal(r.problems.length, 0);
+});
+
 test('safety: the dashboard code cannot place orders or sign requests', () => {
   const docs = path.join(__dirname, '..', '..', 'docs');
   const forbidden = [/\/api\/v3\/order/i, /\/sapi\//i, /\/fapi\//i, /\/dapi\//i, /signature/i, /hmac/i, /X-MBX-APIKEY/i, /newOrder/i, /createOrder/i, /api[_-]?secret/i, /\/withdraw/i];

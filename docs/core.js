@@ -935,7 +935,7 @@
         let j;
         try { j = await fetchJson(url); }
         catch (e) {
-          if (!/HTTP (429|5\d\d)/.test(String(e && e.message))) throw e;
+          if (!/HTTP (429|5\d\d)/.test(String(e && e.message)) || /daily/i.test(String(e && e.message))) throw e;
           await new Promise(function (r) { setTimeout(r, 1500); });
           j = await fetchJson(url);
         }

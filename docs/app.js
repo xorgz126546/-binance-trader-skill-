@@ -3,7 +3,17 @@
   'use strict';
   const BN = window.BN, I18N = window.I18N;
   const api = BN.makeApi(function (u, o) { return fetch(u, o); });
-  const getJ = function (u) { return fetch(u).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }); };
+  // Keep the server's own reason (e.g. rss2json's "Daily rate limit exceeded") next to the HTTP code, so the warning says why.
+  const getJ = function (u) {
+    return fetch(u).then(function (r) {
+      if (r.ok) return r.json();
+      return r.text().then(function (txt) {
+        let why = '';
+        try { why = String((JSON.parse(txt) || {}).message || ''); } catch (e) { why = ''; }
+        throw new Error('HTTP ' + r.status + (why ? ' (' + why.replace(/\s+/g, ' ').slice(0, 110) + ')' : ''));
+      });
+    });
+  };
 
   /* ---------------------------------------------------------------- persistence */
   const LS = {
